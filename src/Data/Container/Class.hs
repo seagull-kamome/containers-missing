@@ -30,10 +30,12 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  -}
+{-# LANGUAGE AllowAmbiguousTypes #-}
 module Data.Container.Class (
   FiniteElements(..),
   Empty(..),
   Full(..),
+  PartialSet(..), StrictSet,
   IsSet(..)
   ) where
 
@@ -66,6 +68,8 @@ class Full c where full :: c
 
 -- --------------------------------------------------------------------------
 --
+
+
 class IsSet c where
   type Elm c :: *
   insert :: Elm c -> c -> c
@@ -87,7 +91,6 @@ class IsSet c where
   (\\) = intersection
   {-# INLINE (\\) #-}
 
-
 instance Ord a => IsSet (Data.Set.Set a) where
   type Elm (Data.Set.Set a) = a
   insert = Data.Set.insert
@@ -106,4 +109,7 @@ instance Ord a => IsSet (Data.Set.Set a) where
   {-# INLINE intersection #-}
   union = Data.Set.union
   {-# INLINE union #-}
+
+class IsSet c => PartialSet c where insertable :: Elm c -> Bool
+class IsSet c => StrictSet c where
 
