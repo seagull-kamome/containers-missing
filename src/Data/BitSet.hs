@@ -32,8 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  -}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE MagicHash #-}
 module Data.BitSet(
+  module Data.Container.Class,
   BitSet, BitSet8, BitSet16, BitSet32, BitSet64, SmallBitSet
   ) where
 

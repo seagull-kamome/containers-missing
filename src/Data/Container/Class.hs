@@ -39,7 +39,10 @@ module Data.Container.Class (
   IsSet(..)
   ) where
 
+import qualified Data.IntSet
 import qualified Data.Set
+import qualified Data.IntMap
+import qualified Data.Map
 
 -- --------------------------------------------------------------------------
 --
@@ -51,15 +54,18 @@ instance FiniteElements (Data.Set.Set a) where
 
 -- --------------------------------------------------------------------------
 --
-class Empty c where
-  empty :: c
-  null :: c -> Bool
+class Empty c where empty :: c
+class Nullable c where  null :: c -> Bool
 
 instance Empty (Data.Set.Set a) where
   empty = Data.Set.empty
   {-# INLINE empty #-}
+instance Nullable (Data.Set.Set a) where
   null = Data.Set.null
   {-# INLINE null #-}
+
+
+
 
 -- --------------------------------------------------------------------------
 --
