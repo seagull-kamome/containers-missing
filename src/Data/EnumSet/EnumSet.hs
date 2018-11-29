@@ -60,7 +60,7 @@ instance Enum e => IsList (EnumSet e) where
   type Item (EnumSet e) = e
   toList = map toEnum . toList . toSet
   {-# INLINE toList #-}
-  fromList = EnumSet . S.fromList . map fromEnum . fromList
+  fromList = EnumSet . S.fromList . map fromEnum
   {-# INLINE fromList #-}
 
 

@@ -36,7 +36,8 @@ module Data.SmallBitSet(
   BitSet, toBits, BitSet8, BitSet16, BitSet32, BitSet64, SmallBitSet,
   size, empty, singleton, full, null,
   fromList, toList,
-  insert, delete, member, notMember,
+  insert, delete,
+  member, notMember, findMin, findMax,
   difference, intersection, union, unions,
   isHabitant, isHabitant',
   habitantRange, habitantRange',
@@ -145,7 +146,7 @@ delete n (BitSet w) = BitSet $ clearBit w n
 
 
 -- ---------------------------------------------------------------------------
--- | Tests
+-- | Lookup
 
 member :: Bits bw => Int -> BitSet bw -> Bool
 member n (BitSet w) = testBit w n
@@ -156,6 +157,14 @@ notMember n = not . member n
 {-# INLINE notMember #-}
 
 
+findMin :: (FiniteBits bw, Num bw) => BitSet bw -> Int   -- partial
+findMin s = head $ filter (`member` s) $ range $ habitantRange s
+
+findMax :: (FiniteBits bw, Num bw) => BitSet bw -> Int   -- partial
+findMax s = head $ filter (`member` s) $ reverse $ range $ habitantRange s
+
+-- lookupMin
+-- lookupMax
 
 -- ---------------------------------------------------------------------------
 -- | Set operation
