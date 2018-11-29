@@ -33,12 +33,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 module Data.SmallBitSet(
-  BitSet, BitSet8, BitSet16, BitSet32, BitSet64, SmallBitSet,
-  size, empty, full, null,
+  BitSet, toBits, BitSet8, BitSet16, BitSet32, BitSet64, SmallBitSet,
+  size, empty, singleton, full, null,
+  fromList, toList,
   insert, delete, member, notMember,
-  difference, intersection, union,
+  difference, intersection, union, unions,
   isHabitant, isHabitant',
-  habitantRange, habitantRange'
+  habitantRange, habitantRange',
+  (\\),
+  partition
   ) where
 
 import Prelude hiding(null)
@@ -46,16 +49,18 @@ import Data.Word
 import Data.Bits (Bits, popCount, (.|.), (.&.),
   complement, setBit, clearBit, testBit, FiniteBits, finiteBitSize)
 import Data.Proxy (Proxy(Proxy))
-import Data.Ix (inRange)
+import Data.Ix (inRange, range)
 import GHC.TypeNats (Nat)
 -- import GHC.Prim
+import GHC.Exts (IsList(..))
 
 -- ---------------------------------------------------------------------------
 
-newtype BitSet bw = BitSet { toBits::bw }
+newtype BitSet bw = BitSet { toBits:: bw }
 deriving instance Eq bw => Eq (BitSet bw)
 deriving instance Ord bw => Ord (BitSet bw)
-deriving instance Show bw => Show (BitSet bw)
+--deriving instance Show bw => Show (BitSet bw)
+--deriving instance Read bw => Read (BitSet bw)
 
 -- ---------------------------------------------------------------------------
 -- | Small bitset
@@ -82,6 +87,23 @@ instance Bits bw => Semigroup (BitSet bw) where
   {-# INLINE (<>) #-}
 instance (Bits bw, Num bw) => Monoid (BitSet bw) where
   mempty = BitSet 0
+  {-# INLINE mempty #-}
+
+instance (FiniteBits bw, Num bw) => IsList (BitSet bw) where
+  type Item (BitSet bw) = Int
+  fromList = BitSet . foldr (flip setBit) (0 :: bw)
+  {-# INLINE fromList #-}
+  toList x = filter (`member` x) $ range $ habitantRange x
+  {-# INLINE toList #-}
+
+instance (FiniteBits bw, Num bw) => Show (BitSet bw) where
+  show xs = "fromList " ++ show (toList xs)
+  {-# INLINE show #-}
+
+instance (FiniteBits bw, Num bw) => Read (BitSet bw) where
+  readsPrec n str = [ (fromList x, str') | (x, str') <- readsPrec n str]
+  {-# INLINE readsPrec #-}
+
 
 -- ---------------------------------------------------------------------------
 -- | Utilities
@@ -105,6 +127,9 @@ empty = BitSet 0
 full :: (Bits bw, Num bw) => BitSet bw
 full = BitSet (complement 0)
 {-# INLINE full #-}
+
+singleton :: forall bw. (Bits bw, Num bw) => Int -> BitSet bw
+singleton n = BitSet $ setBit (0 :: bw) n
 
 
 -- ---------------------------------------------------------------------------
@@ -131,6 +156,7 @@ notMember n = not . member n
 {-# INLINE notMember #-}
 
 
+
 -- ---------------------------------------------------------------------------
 -- | Set operation
 
@@ -144,10 +170,21 @@ intersection :: Bits bw => BitSet bw -> BitSet bw -> BitSet bw
 intersection (BitSet w0) (BitSet w1) = BitSet (w0 .&. w1)
 {-# INLINE intersection #-}
 
+(\\) :: Bits bw => BitSet bw -> BitSet bw -> BitSet bw
+(\\) = intersection
 
 union :: Bits bw => BitSet bw -> BitSet bw -> BitSet bw
 union (BitSet w0) (BitSet w1) = BitSet (w0 .|. w1)
 {-# INLINE union #-}
+
+unions :: (Bits bw, Num bw) => [BitSet bw] -> BitSet bw
+unions = foldr union empty
+{-# INLINE unions #-}
+
+partition :: forall bw. (FiniteBits bw, Num bw) => (Int -> Bool) -> BitSet bw -> (BitSet bw, BitSet bw)
+partition f xs@(BitSet w0) = (BitSet (w0 .&. msk), BitSet (w0 .&. complement msk))
+  where
+    msk = foldr  (flip setBit) (0 :: bw) $ filter f $ range $ habitantRange xs
 
 
 -- ---------------------------------------------------------------------------

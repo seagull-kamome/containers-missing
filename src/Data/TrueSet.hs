@@ -46,8 +46,8 @@ data TrueSetW f a = TrueSetW { exact :: !(f a), inverted :: !Bool }
 type TrueSet a = TrueSetW Data.Set.Set a
 instance Empty (f a) => Empty (TrueSetW f a) where
   empty = TrueSetW empty False
-  null (TrueSetW x False) = null x
-  null _ = False
+  -- null (TrueSetW x False) = null x
+ -- null _ = False
 
 instance Empty (f a) => Full (TrueSetW f a) where
   full = TrueSetW empty True
