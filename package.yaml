@@ -37,6 +37,7 @@ library:
   - GeneralizedNewtypeDeriving
   - FlexibleContexts
   - ScopedTypeVariables
+  - RankNTypes
   dependencies:
   - containers
 
@@ -50,3 +51,5 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - containers-missing
+    - hspec
+

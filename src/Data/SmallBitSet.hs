@@ -109,9 +109,16 @@ instance (FiniteBits bw, Num bw) => Read (BitSet bw) where
 -- ---------------------------------------------------------------------------
 -- | Utilities
 
+-- |
+--
+-- >>> size $ (fromList [2,3,4] :: BitSet Word32)
+-- 3
+--
 size :: Bits bw => BitSet bw -> Int
 size = popCount . toBits
 {-# INLINE size #-}
+
+
 
 null :: (Num bw, Eq bw) => BitSet bw -> Bool
 null (BitSet w) = w == 0
