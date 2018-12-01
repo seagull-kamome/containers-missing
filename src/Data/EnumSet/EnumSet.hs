@@ -39,10 +39,13 @@ module Data.EnumSet.EnumSet (
   findMin, findMax,
   difference, intersection, union, unions,
   (\\),
-  partition, split
+  partition, split,
+  --
+  safeToEnum
   ) where
 
 import Prelude hiding(null)
+import Data.Maybe (mapMaybe)
 import qualified Data.Set as S
 import GHC.Exts (IsList (..))
 
@@ -56,9 +59,16 @@ newtype EnumSet e = EnumSet { toSet :: S.Set Int }
 -- ---------------------------------------------------------------------------
 -- | Instances
 
-instance Enum e => IsList (EnumSet e) where
+safeToEnum :: forall e. (Bounded e, Enum e) => Int -> Maybe e
+safeToEnum n | e0 <= n && e1 >= n = Just $ toEnum n
+             | otherwise = Nothing
+  where e0 = fromEnum (minBound :: e)
+        e1 = fromEnum (maxBound :: e)
+
+
+instance (Bounded e, Enum e) => IsList (EnumSet e) where
   type Item (EnumSet e) = e
-  toList = map toEnum . toList . toSet
+  toList = mapMaybe safeToEnum . toList . toSet
   {-# INLINE toList #-}
   fromList = EnumSet . S.fromList . map fromEnum
   {-# INLINE fromList #-}
@@ -143,6 +153,7 @@ union (EnumSet s1) (EnumSet s2) = EnumSet (S.union s1 s2)
 unions :: [EnumSet e] -> EnumSet e
 unions = EnumSet . S.unions . map toSet
 
+-- partial
 partition :: Enum e => (e -> Bool) -> EnumSet e -> (EnumSet e, EnumSet e)
 partition f (EnumSet s0) = let (s1, s2) = S.partition (f . toEnum) s0
                             in (EnumSet s1, EnumSet s2)
@@ -150,4 +161,7 @@ partition f (EnumSet s0) = let (s1, s2) = S.partition (f . toEnum) s0
 split :: (Enum e, Ord e) => e -> EnumSet e -> (EnumSet e, EnumSet e)
 split x (EnumSet s0) = let (s1, s2) = S.split (fromEnum x) s0
                         in (EnumSet s1, EnumSet s2)
+
+
+-- vim: ts=8 sw=2 expandtab :
 
