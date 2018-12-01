@@ -30,8 +30,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  -}
-module Data.TrueSet.TrueIntSet (
-  TrueIntSet, toIntSet, fromIntSet,
+module Data.TrueSet.TrueSet (
+  TrueSet, toSet, fromIntSet,
   isInverted, null, invert,
   empty, singleton, full, fromList,
   insert, delete, member, notMember,
@@ -39,74 +39,74 @@ module Data.TrueSet.TrueIntSet (
   ) where
 
 import Prelude hiding (null)
-import qualified Data.IntSet as IntSet
+import qualified Data.Set as Set
 
 
 
 -- --------------------------------------------------------------------------
 -- | Type
 
-data TrueIntSet = TrueIntSet { isInverted::Bool, toIntSet :: !IntSet.IntSet }
+data TrueSet a = TrueSet { isInverted::Bool, toSet :: !(Set.Set a) }
 
 -- --------------------------------------------------------------------------
 -- | Utility
 
-null :: TrueIntSet -> Bool
-null (TrueIntSet True _) = False
-null (TrueIntSet False s) = IntSet.null s
+null :: TrueSet a -> Bool
+null (TrueSet True _) = False
+null (TrueSet False s) = Set.null s
 {-# INLINE null #-}
 
-invert :: TrueIntSet -> TrueIntSet
-invert (TrueIntSet b s) = TrueIntSet (not b) s
+invert :: TrueSet a -> TrueSet a
+invert (TrueSet b s) = TrueSet (not b) s
 {-# INLINE invert #-}
 
-fromIntSet :: IntSet.IntSet -> TrueIntSet
-fromIntSet s = TrueIntSet False s
+fromIntSet :: Set.Set a -> TrueSet a
+fromIntSet = TrueSet False
 {-# iNLINE fromIntSet #-}
 
 -- --------------------------------------------------------------------------
 -- | Construction
 
-empty :: TrueIntSet
-empty = TrueIntSet False IntSet.empty
+empty :: TrueSet a
+empty = TrueSet False Set.empty
 {-# INLINE empty #-}
 
-singleton :: Int -> TrueIntSet
-singleton n = TrueIntSet False (IntSet.singleton n)
+singleton :: a -> TrueSet a
+singleton = TrueSet False . Set.singleton
 {-# INLINE singleton #-}
 
 
-full :: TrueIntSet
+full :: TrueSet a
 full = invert empty
 {-# INLINE full #-}
 
 
-fromList :: [Int] -> TrueIntSet
-fromList xs = TrueIntSet False (IntSet.fromList xs)
+fromList :: Ord a => [a] -> TrueSet a
+fromList = TrueSet False . Set.fromList
 {-# INLINE fromList #-}
 
 
 -- --------------------------------------------------------------------------
 -- | Insert / Delete
 
-insert :: Int -> TrueIntSet -> TrueIntSet
-insert x (TrueIntSet False s) = TrueIntSet False (IntSet.insert x s)
-insert x (TrueIntSet True s) = TrueIntSet False (IntSet.delete x s)
+insert :: Ord a => a -> TrueSet a -> TrueSet a
+insert x y@(TrueSet False s) = y { toSet = Set.insert x s }
+insert x y@(TrueSet True s) = y { toSet = Set.delete x s }
 {-# INLINE insert #-}
 
-delete :: Int -> TrueIntSet -> TrueIntSet
-delete x (TrueIntSet False s) = TrueIntSet False (IntSet.delete x s)
-delete x (TrueIntSet True s) = TrueIntSet False (IntSet.insert x s)
+delete :: Ord a => a -> TrueSet a -> TrueSet a
+delete x y@(TrueSet False s) = y { toSet = Set.delete x s }
+delete x y@(TrueSet True s) = y { toSet = Set.insert x s }
 {-# INLINE delete #-}
 
 -- --------------------------------------------------------------------------
 -- | Lookup
 
-member :: Int -> TrueIntSet -> Bool
-member x (TrueIntSet inv s) = inv /= IntSet.member x s
+member :: Ord a => a -> TrueSet a -> Bool
+member x (TrueSet inv s) = inv /= Set.member x s
 {-# INLINE member #-}
 
-notMember :: Int -> TrueIntSet -> Bool
+notMember :: Ord a => a -> TrueSet a -> Bool
 notMember x = not . member x
 {-# INLINE notMember #-}
 
@@ -114,18 +114,18 @@ notMember x = not . member x
 -- --------------------------------------------------------------------------
 -- | Set operation
 
-difference, intersection, union :: TrueIntSet -> TrueIntSet -> TrueIntSet
+difference, intersection, union :: Ord a => TrueSet a -> TrueSet a -> TrueSet a
 difference x y = x `intersection` invert y
 {-# iNLINE difference #-}
-intersection (TrueIntSet inv0 x) (TrueIntSet inv1 y)
-  | inv0 /= inv1 = TrueIntSet False (x `IntSet.difference` y)
-  | inv0         = TrueIntSet True (x `IntSet.union` y)
-  | otherwise    = TrueIntSet False (x `IntSet.intersection` y)
+intersection (TrueSet inv0 x) (TrueSet inv1 y)
+  | inv0 /= inv1 = TrueSet False (x `Set.difference` y)
+  | inv0         = TrueSet True (x `Set.union` y)
+  | otherwise    = TrueSet False (x `Set.intersection` y)
 {-# INLINE intersection #-}
-union (TrueIntSet inv0 x) (TrueIntSet inv1 y)
-  | inv0 /= inv1 = TrueIntSet True (x `IntSet.difference` y)
-  | inv0         = TrueIntSet True (x `IntSet.intersection` y)
-  | otherwise    = TrueIntSet False (x `IntSet.union` y)
+union (TrueSet inv0 x) (TrueSet inv1 y)
+  | inv0 /= inv1 = TrueSet True (x `Set.difference` y)
+  | inv0         = TrueSet True (x `Set.intersection` y)
+  | otherwise    = TrueSet False (x `Set.union` y)
 {-# INLINE union #-}
 
 -- vim: ts=8 sw=2 expandtab :
