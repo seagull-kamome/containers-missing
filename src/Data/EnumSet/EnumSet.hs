@@ -46,13 +46,13 @@ module Data.EnumSet.EnumSet (
 
 import Prelude hiding(null)
 import Data.Maybe (mapMaybe)
-import qualified Data.Set as S
+import qualified Data.IntSet as S
 import GHC.Exts (IsList (..))
 
 -- ---------------------------------------------------------------------------
 -- | Type
 
-newtype EnumSet e = EnumSet { toSet :: S.Set Int }
+newtype EnumSet e = EnumSet { toSet :: S.IntSet }
   deriving (Semigroup, Monoid)
 
 
