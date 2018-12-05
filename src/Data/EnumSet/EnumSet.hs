@@ -31,7 +31,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  -}
 module Data.EnumSet.EnumSet (
-  EnumSet, toSet,
+  EnumSet(..),
   size, null,
   empty, singleton, full,
   fromList, toList,
