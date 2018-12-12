@@ -31,7 +31,6 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  -}
 {-# LANGUAGE TupleSections #-}
-{-# LANGUAGE StandaloneDeriving #-}
 module Data.EnumMap.Strict (
   EnumMap(..),
   (!?), (\\),
@@ -68,13 +67,15 @@ import Control.Applicative (Applicative)
 -- import Control.Monad
 import GHC.Exts (IsList (..))
 
+import qualified Data.Binary as BIN
+
 import qualified Data.EnumSet.EnumSet as ESet
 
 -- ---------------------------------------------------------------------------
 -- | Type
 
 newtype EnumMap e a = EnumMap { toMap :: M.IntMap a }
-  deriving (Semigroup, Monoid, Functor, Foldable)
+  deriving (Semigroup, Monoid, Functor, Foldable, BIN.Binary)
 
 -- ---------------------------------------------------------------------------
 -- | Instances

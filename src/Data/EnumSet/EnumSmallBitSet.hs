@@ -30,8 +30,6 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  -}
-{-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE ScopedTypeVariables #-}
 module Data.EnumSet.EnumSmallBitSet (
   EnumBitSet, toBitSet,
   EnumBitSet8, EnumBitSet16, EnumBitSet32, EnumBitSet64,
@@ -53,6 +51,8 @@ import qualified Data.SmallBitSet as SBS
 import GHC.TypeNats (Nat)
 import GHC.Exts (IsList (..))
 
+import qualified Data.Binary as BIN
+
 -- ---------------------------------------------------------------------------
 -- | Type
 
@@ -61,6 +61,7 @@ deriving instance Eq bw => Eq (EnumBitSet bw e)
 deriving instance Ord bw => Ord (EnumBitSet bw e)
 deriving instance Bits bw => Semigroup (EnumBitSet bw e)
 deriving instance (Bits bw, Num bw) => Monoid (EnumBitSet bw e)
+deriving instance BIN.Binary bw => BIN.Binary (EnumBitSet bw e)
 
 
 -- ---------------------------------------------------------------------------

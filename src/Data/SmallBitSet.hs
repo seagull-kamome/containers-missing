@@ -55,6 +55,7 @@ import GHC.TypeNats (Nat)
 -- import GHC.Prim
 import GHC.Exts (IsList(..))
 
+import qualified Data.Binary as BIN
 -- ---------------------------------------------------------------------------
 
 newtype BitSet bw = BitSet { toBits:: bw }
@@ -62,6 +63,8 @@ deriving instance Eq bw => Eq (BitSet bw)
 deriving instance Ord bw => Ord (BitSet bw)
 --deriving instance Show bw => Show (BitSet bw)
 --deriving instance Read bw => Read (BitSet bw)
+deriving instance BIN.Binary bw => BIN.Binary (BitSet bw)
+
 
 -- ---------------------------------------------------------------------------
 -- | Small bitset

@@ -41,12 +41,16 @@ module Data.TrueSet.TrueIntSet (
 import Prelude hiding (null)
 import qualified Data.IntSet as IntSet
 
-
+import qualified Data.Binary as BIN
 
 -- --------------------------------------------------------------------------
 -- | Type
 
 data TrueIntSet = TrueIntSet { isInverted::Bool, toIntSet :: !IntSet.IntSet }
+instance BIN.Binary TrueIntSet where
+  put (TrueIntSet x y) = BIN.put x >> BIN.put y
+  get = TrueIntSet <$> BIN.get <*> BIN.get
+
 
 -- --------------------------------------------------------------------------
 -- | Utility

@@ -49,11 +49,13 @@ import Data.Maybe (mapMaybe)
 import qualified Data.IntSet as S
 import GHC.Exts (IsList (..))
 
+import qualified Data.Binary as BIN
+
 -- ---------------------------------------------------------------------------
 -- | Type
 
 newtype EnumSet e = EnumSet { toSet :: S.IntSet }
-  deriving (Semigroup, Monoid)
+  deriving (Semigroup, Monoid, BIN.Binary)
 
 
 -- ---------------------------------------------------------------------------
